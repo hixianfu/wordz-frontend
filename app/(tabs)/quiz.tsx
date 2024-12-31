@@ -62,7 +62,7 @@ export default function QuizScreen() {
                         }
                     </View>
 
-                    <ScrollView style={{ height: '88%' }}>
+                    <ScrollView style={{ height: '87%' }}>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, padding: 8 }}>
                             {books.length > 0 && books.map((book) => (
                                 <Pressable key={book.id} onPress={() => router.push(`/level?bookId=${book.id}`)} style={{ width: '48%', }}>
