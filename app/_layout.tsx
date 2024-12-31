@@ -9,9 +9,8 @@ import { Platform } from 'react-native';
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
-import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-import { HomeIcon } from 'lucide-react-native';
+import { Bookmark } from '~/lib/icons';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -74,6 +73,13 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen name='level' options={{
+          headerShown: true,
+          headerRight: () => (
+            <Bookmark size={24} className='text-black dark:text-white' />
+          )
+        }} />
+
       </Stack>
       <PortalHost />
     </ThemeProvider>

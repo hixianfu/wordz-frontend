@@ -9,7 +9,7 @@ const axios = useAxios();
  * @returns 
  */
 export const getBooksByDifficulty = async (difficulty?: string): Promise<Book[]> => {
-    return await axios.get('/book/difficulty', { params: { difficulty } });
+    return await axios.get('/book/difficulty', { params: { difficulty: difficulty === '全部' ? undefined : difficulty } });
 };
 
 
