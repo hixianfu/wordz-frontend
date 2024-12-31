@@ -27,7 +27,6 @@ export default function TabLayout() {
             }}>
             <Tabs.Screen name="index" options={{
                 title: '首页',
-                headerShown: true,
                 tabBarIcon: ({ color, size }) => (
                     <HomeIcon color={color} size={size} />
                 ),
