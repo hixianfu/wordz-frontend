@@ -3,6 +3,7 @@ import { BookOpenIcon, HomeIcon } from "lucide-react-native";
 import { Platform } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { HapticTab } from "~/components/HapticTab";
+import { ThemeToggle } from "~/components/ThemeToggle";
 import TabBarBackground from "~/components/ui/TabBarBackground";
 import { useColorScheme } from "~/hooks/useColorScheme";
 
@@ -25,18 +26,20 @@ export default function TabLayout() {
                 }),
             }}>
             <Tabs.Screen name="index" options={{
-                title: 'Home',
+                title: '首页',
                 headerShown: true,
-                tabBarIcon: ({ color, focused, size }) => (
+                tabBarIcon: ({ color, size }) => (
                     <HomeIcon color={color} size={size} />
-                )
+                ),
+                headerRight: () => <ThemeToggle />
             }} />
-            {/* quiz tab */}
             <Tabs.Screen name="quiz" options={{
-                title: 'Quiz',
-                tabBarIcon: ({ color, focused, size }) => (
+                title: '题本',
+                headerShown: true,
+                tabBarIcon: ({ color, size }) => (
                     <BookOpenIcon color={color} size={size} />
-                )
+                ),
+                headerRight: () => <ThemeToggle />
             }} />
         </Tabs>
     )
