@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import PagerView from 'react-native-pager-view';
 
 import { getDailyWords } from '~/apis/word';
@@ -8,49 +9,62 @@ import { Progress } from '~/components/ui/progress';
 import { P } from '~/components/ui/typography';
 import { Text } from '~/components/ui/text';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { Volume2, X } from '~/lib/icons';
+import { Ellipsis, Volume2, X } from '~/lib/icons';
 import { Word } from '~/types';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogCancel, AlertDialogTrigger, AlertDialogDescription, AlertDialogTitle, AlertDialogHeader, AlertDialogFooter } from '~/components/ui/alert-dialog';
 import { Button } from '~/components/ui/button';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { router } from 'expo-router';
+import { updateUserWordProgress } from '~/apis/word';
 
 export default function MyPager() {
+    const { isDarkColorScheme } = useColorScheme();
+    const pagerRef = useRef<PagerView>(null);
+
+    const [userId, setUserId] = useState(1);
     const [tab, setTab] = useState('释义')
+    const [currentPage, setCurrentPage] = useState(0);
     const [words, setWords] = useState<Word[]>([]);
 
-    const { isDarkColorScheme } = useColorScheme();
-
-    const handlePageSelected = () => {
+    const handlePageSelected = (e: any) => {
+        setCurrentPage(e.nativeEvent.position)
         setTab('释义')
     }
 
-    useEffect(() => {
-        getDailyWords().then(response => {
-            setWords(response);
-        });
-    }, []);
+    const handleUpdateUserWordProgress = async (status: '0' | '1' | '2') => {
+        const word = words[currentPage];
+
+        await updateUserWordProgress({ userId: 1, wordId: word.id, status, nextReviewTime: '2025-01-04' });
+        pagerRef.current?.setPage(currentPage + 1);
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            getDailyWords().then(response => {
+                setWords(response);
+            });
+        }, [])
+    );
 
     return (
         <AlertDialog>
             <View style={styles.container} className='p-4 pt-12 bg-[#FFFCF7] dark:bg-black'>
-                <PagerView style={styles.container} initialPage={0} onPageSelected={handlePageSelected}>
+                <View className='flex flex-row items-center'>
+                    <AlertDialogTrigger asChild>
+                        <IconButton icon={<X size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} />
+                    </AlertDialogTrigger>
 
+                    <Progress className='h-2 flex-1 my-1' value={(currentPage + 1) / words.length * 100} />
+                    <View className='ml-2'>
+                        <Text>{currentPage + 1}/{words.length}</Text>
+                    </View>
+                </View>
+                <PagerView ref={pagerRef} style={styles.container} initialPage={currentPage} onPageSelected={handlePageSelected}>
                     {
-                        words.map((word, index) => {
+                        words.length > 0 && words.map((word, index) => {
                             return (
                                 <View className='w-full h-full flex-col items-center' key={index}>
-                                    <View className='flex flex-row items-center'>
-                                        <AlertDialogTrigger asChild>
-                                            <IconButton icon={<X size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} />
-                                        </AlertDialogTrigger>
 
-                                        <Progress className='h-2 flex-1 my-1' value={0.5} />
-                                        <View className='ml-2'> 
-                                            <Text>1/10</Text>
-                                        </View>
-                                    </View>
-                                    <P className={(word.cet4_word.length >= 14 ? 'text-5xl' : 'text-7xl') + ' font-bold text-center mt-10'}>{word.cet4_word}</P>
+                                    <P className={(word.cet4_word.length >= 10 ? 'text-6xl' : 'text-7xl') + ' font-bold text-center mt-10'}>{word.cet4_word}</P>
 
                                     <View className='py-8'>
                                         <View className='flex flex-row justify-center items-center w-96'>
@@ -75,30 +89,52 @@ export default function MyPager() {
                                                 <Text>短语</Text>
                                             </TabsTrigger>
                                         </TabsList>
-                                        <TabsContent value="释义" className='p-4'>
+                                        <TabsContent value="释义" className='p-4' style={{ height: '68%' }}>
                                             <P>
                                                 {word.cet4_translate}
                                             </P>
                                         </TabsContent>
-                                        <TabsContent value="例句" style={{ height: '70%' }}>
+                                        <TabsContent value="例句" style={{ height: '68%' }}>
                                             <ScrollView style={{ padding: 8, paddingRight: 4 }}>
                                                 <P>
                                                     {word.cet4_samples}
                                                 </P>
+                                            </ScrollView>   
+                                        </TabsContent>
+                                        <TabsContent value="短语" className='p-4' style={{ height: '68%' }}>
+                                            <ScrollView style={{ padding: 8, paddingRight: 4 }}>
+                                                <P>
+                                                    {word.cet4_phrase}
+                                                </P>
                                             </ScrollView>
                                         </TabsContent>
-                                        <TabsContent value="短语" className='p-4'>
-                                            <P>
-                                                {word.cet4_phrase}
-                                            </P>
-                                        </TabsContent>
                                     </Tabs>
+
+
                                 </View>
                             )
                         })
                     }
                 </PagerView>
 
+                <View className='absolute bottom-4 left-0 px-4 flex flex-row justify-between w-full gap-2'>
+                    <Button variant='outline' className='flex-1' onPress={() => handleUpdateUserWordProgress('0')}>
+                        <Text>
+                            遗忘
+                        </Text>
+                    </Button>
+                    <Button variant='outline' className='flex-1' onPress={() => handleUpdateUserWordProgress('1')}>
+                        <Text>
+                            熟悉
+                        </Text>
+                    </Button>
+                    <Button variant='outline' className='flex-1' onPress={() => handleUpdateUserWordProgress('2')}>
+                        <Text>
+                            已学会
+                        </Text>
+                    </Button>
+                    <IconButton variant='outline' icon={<Ellipsis size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} />
+                </View>
 
                 <AlertDialogContent className='w-2/3'>
                     <AlertDialogHeader>

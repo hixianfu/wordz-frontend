@@ -5,12 +5,14 @@ import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from '@react-navigation
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-import { Bookmark } from '~/lib/icons/index';
+import { Bookmark, Search } from '~/lib/icons/index';
+import { Input } from '~/components/ui/input';
+import { IconButton } from '~/components/ui/IconButton';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -82,7 +84,13 @@ export default function RootLayout() {
             <Bookmark size={24} className='text-black dark:text-white' />
           )
         }} />
-
+        <Stack.Screen name='filter' options={{
+          headerShown: true,
+          headerTitle: '',
+          headerRight: () => (
+            <IconButton icon={<Search size={24} className='text-black dark:text-white' />} />
+          ),
+        }} />
       </Stack>
       <PortalHost />
     </ThemeProvider>

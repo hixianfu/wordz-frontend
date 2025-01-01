@@ -1,4 +1,5 @@
 import { Pressable, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
 
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
@@ -9,9 +10,20 @@ import { Button } from "~/components/ui/button";
 import { Stats } from "~/components/ui/stats";
 import { Progress } from "~/components/ui/progress";
 import CircularProgress from "~/components/CircleProgress";
-import { router } from "expo-router";
+import { getUserWordProgress } from "~/apis/word";
+import { useCallback, useState } from "react";
 
 export default function HomeScreen() {
+    const [progress, setProgress] = useState<{ learned: number, familiar: number, forgotten: number }>({ learned: 0, familiar: 0, forgotten: 0 });
+
+    useFocusEffect(
+        useCallback(() => {
+            getUserWordProgress().then(response => {
+                setProgress(response);
+            });
+        }, [])
+    );
+
     return (
         <View className="p-4 pt-12">
             <Card className="rounded-md">
@@ -41,7 +53,7 @@ export default function HomeScreen() {
                             今日概览
                         </P>
                     </View>
-                    <View className="absolute right-0">
+                    <View className="absolute -right-2">
                         <Button variant='ghost' className="flex flex-row items-center gap-1">
                             <Share size={20} color={'grey'} />
                             <Text>分享成绩</Text>
@@ -74,8 +86,8 @@ export default function HomeScreen() {
                             </P>
                         </View>
                         <View style={{ flex: 1 }} className="flex flex-row items-center gap-2 pr-2">
-                            <Progress value={10} className='h-2 w-10/12' indicatorClassName='bg-green-500' />
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">2717词</Text>
+                            <Progress value={progress.forgotten / 4000 * 100} className='h-2 w-10/12' indicatorClassName='bg-green-500' />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">{progress.forgotten}词</Text>
                         </View>
                     </CardHeader>
                     <CardFooter className="flex justify-end p-1.5">
@@ -94,7 +106,7 @@ export default function HomeScreen() {
                                     强化复习
                                 </P>
                             </View>
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">2717词</Text>
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">{progress.familiar}词</Text>
                         </CardHeader>
                         <CardFooter className="flex justify-end p-1.5">
                             <Text className="text-sm text-orange-500">正在复习</Text>
@@ -109,28 +121,32 @@ export default function HomeScreen() {
                                     轻松回顾
                                 </P>
                             </View>
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">2717词</Text>
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">{progress.learned}词</Text>
                         </CardHeader>
                         <CardFooter className="flex justify-end p-1.5">
-                            <Text className="text-sm text-sky-500">正在复习</Text>
+                            <Text className="text-sm text-sky-500">正在回顾</Text>
                         </CardFooter>
                     </Card>
                 </View>
-                <View className="w-1/2">
-                    <Card className="rounded-md mt-2">
-                        <CardHeader className="flex flex-row gap-2 items-center pb-3">
-                            <View className="flex flex-row gap-2 items-center">
-                                <SlidersHorizontal size={20} color={'grey'} />
-                                <P className="text-xl font-bold">
-                                    筛选单词
-                                </P>
-                            </View>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-center pt-0 pb-2 relative">
-                            <CircularProgress progress={90} size={100} strokeWidth={3} color="#22c55e" />
-                            <Text className="text-xl font-bold text-green-500 absolute">90%</Text>
-                        </CardContent>
-                    </Card>
+                <View className="w-[49%]">
+                    <Pressable onPress={() => {
+                        router.push('/filter')
+                    }}>
+                        <Card className="rounded-md mt-2">
+                            <CardHeader className="flex flex-row gap-2 items-center pb-3">
+                                <View className="flex flex-row gap-2 items-center">
+                                    <SlidersHorizontal size={20} color={'grey'} />
+                                    <P className="text-xl font-bold">
+                                        筛选单词
+                                    </P>
+                                </View>
+                            </CardHeader>
+                            <CardContent className="flex items-center justify-center pt-0 pb-2 relative">
+                                <CircularProgress progress={90} size={100} strokeWidth={3} color="#22c55e" />
+                                <Text className="text-xl font-bold text-green-500 absolute">90%</Text>
+                            </CardContent>
+                        </Card>
+                    </Pressable>
                 </View>
             </View>
         </View>
