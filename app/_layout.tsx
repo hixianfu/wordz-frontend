@@ -10,7 +10,7 @@ import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-import { Bookmark } from '~/lib/icons';
+import { Bookmark } from '~/lib/icons/index';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -73,6 +73,9 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen name='word' options={{
+          headerShown: false,
+        }} />
         <Stack.Screen name='level' options={{
           headerShown: true,
           headerRight: () => (

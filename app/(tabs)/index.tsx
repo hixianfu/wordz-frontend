@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import { Stats } from "~/components/ui/stats";
 import { Progress } from "~/components/ui/progress";
 import CircularProgress from "~/components/CircleProgress";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
     return (
@@ -24,7 +25,7 @@ export default function HomeScreen() {
                             3919词
                         </Text>
                     </View>
-                    <View className="flex flex-row items-center absolute -right-10">
+                    <View className="flex flex-row items-center absolute right-0">
                         <IconButton icon={<ArrowUpDown size={20} color={'grey'} />} />
                         <IconButton icon={<Bolt size={20} color={'grey'} />} />
                     </View>
@@ -40,7 +41,7 @@ export default function HomeScreen() {
                             今日概览
                         </P>
                     </View>
-                    <View className="absolute -right-10">
+                    <View className="absolute right-0">
                         <Button variant='ghost' className="flex flex-row items-center gap-1">
                             <Share size={20} color={'grey'} />
                             <Text>分享成绩</Text>
@@ -61,23 +62,27 @@ export default function HomeScreen() {
                 </CardContent>
             </Card>
 
-            <Card className="rounded-md mt-2">
-                <CardHeader className="flex flex-row gap-2 items-center pb-1">
-                    <View className="flex flex-row gap-2 items-center">
-                        <PenTool size={20} color={'grey'} />
-                        <P className="text-xl font-bold">
-                            单词初记
-                        </P>
-                    </View>
-                    <View style={{ flex: 1 }} className="flex flex-row items-center gap-2 pr-2">
-                        <Progress value={10} className='h-2 w-10/12' indicatorClassName='bg-green-500' />
-                        <Text className="text-sm text-gray-500 dark:text-gray-400">2717词</Text>
-                    </View>
-                </CardHeader>
-                <CardFooter className="flex justify-end p-1.5">
-                    <Text className="text-sm text-green-500">正在学习</Text>
-                </CardFooter>
-            </Card>
+            <Pressable onPress={() => {
+                router.push('/word')
+            }}>
+                <Card className="rounded-md mt-2">
+                    <CardHeader className="flex flex-row gap-2 items-center pb-1">
+                        <View className="flex flex-row gap-2 items-center">
+                            <PenTool size={20} color={'grey'} />
+                            <P className="text-xl font-bold">
+                                单词初记
+                            </P>
+                        </View>
+                        <View style={{ flex: 1 }} className="flex flex-row items-center gap-2 pr-2">
+                            <Progress value={10} className='h-2 w-10/12' indicatorClassName='bg-green-500' />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">2717词</Text>
+                        </View>
+                    </CardHeader>
+                    <CardFooter className="flex justify-end p-1.5">
+                        <Text className="text-sm text-green-500">正在学习</Text>
+                    </CardFooter>
+                </Card>
+            </Pressable>
 
             <View className="flex flex-row gap-2">
                 <View className="w-1/2">

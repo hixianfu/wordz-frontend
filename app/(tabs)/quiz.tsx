@@ -1,9 +1,9 @@
 import { View, Image, Pressable, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
-import { BookmarkIcon } from "lucide-react-native";
 
 import { Card, CardFooter, CardHeader } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
+import { Bookmark } from "~/lib/icons/index";
 
 import { getBooksByDifficulty } from "~/apis/book";
 import { Book } from "~/types";
@@ -70,7 +70,7 @@ export default function QuizScreen() {
                                         <CardHeader className="p-0 relative">
                                             <Image source={{ uri: book.cover }} style={{ width: '100%', height: 200 }} className="rounded-tl-lg rounded-tr-lg" />
                                             <Button className="absolute top-2 w-12 right-2 bg-[rgba(0,0,0,0.3)] rounded-full" onPress={() => { }}>
-                                                <BookmarkIcon size={24} color={'grey'} />
+                                                <Bookmark size={24} color={'grey'} />
                                             </Button>
                                         </CardHeader>
                                         <CardFooter className="flex-col pt-2">
