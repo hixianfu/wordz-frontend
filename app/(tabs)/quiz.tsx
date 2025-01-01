@@ -54,7 +54,7 @@ export default function QuizScreen() {
                         {
                             BOOKS_DIFFICULTY.map((item, index) => (
                                 <View key={index}>
-                                    <Button variant={bookDifficulty === item ? 'default' : 'outline'} onPress={() => handleBookDifficultyChange(item)}>
+                                    <Button className="rounded-full" size='sm' variant={bookDifficulty === item ? 'default' : 'outline'} onPress={() => handleBookDifficultyChange(item)}>
                                         <Text>{item}</Text>
                                     </Button>
                                 </View>

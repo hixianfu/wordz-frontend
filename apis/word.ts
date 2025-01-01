@@ -34,6 +34,16 @@ export const getUserWordProgress = async (id: number = 1): Promise<{ learned: nu
     return await axios.get('/progress/cet4/learned', { params: { id } });
 }
 
+/**
+ * 获取单词音频
+ * @param type 0:美音 1:英音
+ * @param audio 单词
+ * @returns 
+ */
+export const audioUrl = (type: number, audio: string) => {
+    return `https://dict.youdao.com/dictvoice?type=${type}&audio=${audio}`
+}
+
 
 export interface UpdateUserWordProgressPayload {
     userId: number;

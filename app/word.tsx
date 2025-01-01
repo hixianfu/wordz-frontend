@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, ToastAndroid, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import PagerView from 'react-native-pager-view';
+import { Audio } from "expo-av";
 
-import { getDailyWords } from '~/apis/word';
+import { audioUrl, getDailyWords } from '~/apis/word';
 import { IconButton } from '~/components/ui/IconButton';
 import { Progress } from '~/components/ui/progress';
 import { P } from '~/components/ui/typography';
@@ -16,6 +17,11 @@ import { Button } from '~/components/ui/button';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { updateUserWordProgress } from '~/apis/word';
 
+type WordWithAudio = Word & {
+    audio_us: string;
+    audio_uk: string;
+}
+
 export default function MyPager() {
     const { isDarkColorScheme } = useColorScheme();
     const pagerRef = useRef<PagerView>(null);
@@ -23,7 +29,7 @@ export default function MyPager() {
     const [userId, setUserId] = useState(1);
     const [tab, setTab] = useState('释义')
     const [currentPage, setCurrentPage] = useState(0);
-    const [words, setWords] = useState<Word[]>([]);
+    const [words, setWords] = useState<WordWithAudio[]>([]);
 
     const handlePageSelected = (e: any) => {
         setCurrentPage(e.nativeEvent.position)
@@ -37,10 +43,29 @@ export default function MyPager() {
         pagerRef.current?.setPage(currentPage + 1);
     }
 
+    // 播放单词音频
+    async function playSound(url: string) {
+        const { sound } = await Audio.Sound.createAsync(
+            {
+                uri: url,
+            }
+        );
+
+        try {
+            await sound.playAsync();
+        } catch (error) {
+            ToastAndroid.show('播放失败,请稍后再试', ToastAndroid.SHORT);
+        }
+    }
+
     useFocusEffect(
         useCallback(() => {
-            getDailyWords().then(response => {
-                setWords(response);
+            getDailyWords().then(wordList => {
+                setWords(wordList.map(word => ({
+                    ...word,
+                    audio_us: audioUrl(0, word.cet4_word),
+                    audio_uk: audioUrl(1, word.cet4_word)
+                })));
             });
         }, [])
     );
@@ -69,11 +94,11 @@ export default function MyPager() {
                                     <View className='py-8'>
                                         <View className='flex flex-row justify-center items-center w-96'>
                                             <P className='text-center'>{word.cet4_phonetic.split('美')[0]}</P>
-                                            <IconButton style={{ marginLeft: 8 }} icon={<Volume2 size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} />
+                                            <IconButton style={{ marginLeft: 8 }} icon={<Volume2 size={24} color={isDarkColorScheme ? 'grey' : 'black'} onPress={() => playSound(word.audio_uk)} />} />
                                         </View>
                                         <View className='flex flex-row justify-center items-center w-96'>
                                             <P className='text-center'>美{word.cet4_phonetic.split('美')[1]}</P>
-                                            <IconButton style={{ marginLeft: 8 }} icon={<Volume2 size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} />
+                                            <IconButton style={{ marginLeft: 8 }} icon={<Volume2 size={24} color={isDarkColorScheme ? 'grey' : 'black'} />} onPress={() => playSound(word.audio_us)} />
                                         </View>
                                     </View>
 
@@ -99,7 +124,7 @@ export default function MyPager() {
                                                 <P>
                                                     {word.cet4_samples}
                                                 </P>
-                                            </ScrollView>   
+                                            </ScrollView>
                                         </TabsContent>
                                         <TabsContent value="短语" className='p-4' style={{ height: '68%' }}>
                                             <ScrollView style={{ padding: 8, paddingRight: 4 }}>
