@@ -89,7 +89,7 @@ export default function MyPager() {
                             return (
                                 <View className='w-full h-full flex-col items-center' key={index}>
 
-                                    <P className={(word.cet4_word.length >= 10 ? 'text-6xl' : 'text-7xl') + ' font-bold text-center mt-10'}>{word.cet4_word}</P>
+                                    <Text className={(word.cet4_word.length >= 10 ? 'text-5xl' : 'text-6xl') + ' leading-tight font-bold text-center mt-10'}>{word.cet4_word}</Text>
 
                                     <View className='py-8'>
                                         <View className='flex flex-row justify-center items-center w-96'>
